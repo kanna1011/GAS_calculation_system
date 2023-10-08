@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <div>
+      <label>大人人数:</label>
+      <input type="number" id="adultCount">
+    </div>
+    <div>
+      <label>子供人数:</label>
+      <input type="number" id="childCount">
+    </div>
+    <div>
+        <label>クーポン設定:</label>
+        <select id="couponSetting">
+        </select>
+      </div>
+    <button onclick="submitData()">送信</button>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            google.script.run.withSuccessHandler(populateCoupons).getCoupons();
+        });
+        function populateCoupons(couponList) {
+            const selectElem = document.getElementById('couponSetting');
+
+            // 「選択なし」のオプションを追加
+            const defaultOption = document.createElement('option');
+            defaultOption.value = "";
+            defaultOption.text = "選択なし";
+            selectElem.appendChild(defaultOption);
+    
+            // 他のクーポンオプションを追加
+            couponList.forEach(function(coupon) {
+                const option = document.createElement('option');
+                option.value = coupon;
+                option.text = coupon;
+                selectElem.appendChild(option);
+            });
+        }
+        function submitData() {
+        var adultCount = document.getElementById("adultCount").value;
+        var childCount = document.getElementById("childCount").value;
+        var couponSetting = document.getElementById("couponSetting").value;
+        
+        google.script.run.appendFormData(adultCount, childCount, couponSetting);
+        google.script.host.close();
+        }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <div>
+      <label>番号:</label>
+      <input type="number" id="id">
+    </div>
+    <button onclick="submitData()">送信</button>
+    <script>
+      function submitData() {
+        var id = parseInt(document.getElementById("id").value);
+        
+        google.script.run.calculateSettlement(id);
+        google.script.host.close();
+      }
+    </script>
+  </body>
+</html>
