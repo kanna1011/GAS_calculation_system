@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <div>
+      <label>清算番号:</label>
+      <input type="number" id="id">
+    </div>
+    <div id="discountContainer">
+        <!-- セレクトボックスが動的に追加される場所 -->
+    </div>
+    <div id="discountScope">
+      <label><input type="radio" name="discountScopeOption" value="1" checked>全員適用</label>
+      <label><input type="radio" name="discountScopeOption" value="2">大人のみ適用</label>
+      <label><input type="radio" name="discountScopeOption" value="3">子供のみ適用</label>
+    </div>
+    <button onclick="submitData()">送信</button>
+    <script>
+        function populateDiscounts(optionList) {
+            const containerElem = document.getElementById('discountContainer');
+
+            const selectElem = document.createElement('select');
+            selectElem.id = 'discountSelect';
+            selectElem.className = 'optionDropdown';
+
+            optionList.forEach(function(option) {
+                const optionElem = document.createElement('option');
+                optionElem.value = option.value;
+                optionElem.innerText = option.label;
+                selectElem.appendChild(optionElem);
+            });
+
+            containerElem.appendChild(selectElem);
+        }
+
+        function submitData() {
+            var id = parseInt(document.getElementById("id").value);
+            var discountSelect = document.getElementById("discountSelect");
+            var selectedValue = parseInt(discountSelect.value);
+            var selectedLabel = discountSelect.options[discountSelect.selectedIndex].text;
+
+            var selectedDiscountScopeElem = document.querySelector('input[name="discountScopeOption"]:checked');
+            var selectedDiscountScopeValue = selectedDiscountScopeElem.value;
+            var selectedDiscountScopeLabel = selectedDiscountScopeElem.parentNode.innerText;
+
+            google.script.run.appendDiscountData(id, selectedLabel, selectedDiscountScopeLabel);
+            google.script.run.calculateSettlement(id, selectedValue, selectedDiscountScopeLabel);
+            google.script.host.close();
+        }
+
+        // こちらを直接呼び出します。
+        google.script.run.withSuccessHandler(populateDiscounts).getDiscounts();
+
+    </script>
+  </body>
+</html>

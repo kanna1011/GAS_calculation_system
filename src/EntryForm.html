@@ -9,39 +9,37 @@
       <label>子供人数:</label>
       <input type="number" id="childCount">
     </div>
-    <div>
-        <label>クーポン設定:</label>
-        <select id="couponSetting">
-        </select>
-      </div>
+    <div id="optionsContainer">
+        <!-- ここに動的にチェックボックスが追加 -->
+    </div>
     <button onclick="submitData()">送信</button>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            google.script.run.withSuccessHandler(populateCoupons).getCoupons();
+            google.script.run.withSuccessHandler(populateOptions).getOptions();
         });
-        function populateCoupons(couponList) {
-            const selectElem = document.getElementById('couponSetting');
+        function populateOptions(optionList) {
+            const containerElem = document.getElementById('optionsContainer');
 
-            // 「選択なし」のオプションを追加
-            const defaultOption = document.createElement('option');
-            defaultOption.value = "";
-            defaultOption.text = "選択なし";
-            selectElem.appendChild(defaultOption);
-    
-            // 他のクーポンオプションを追加
-            couponList.forEach(function(coupon) {
-                const option = document.createElement('option');
-                option.value = coupon;
-                option.text = coupon;
-                selectElem.appendChild(option);
+            optionList.forEach(function(option) {
+                const labelElem = document.createElement('label');
+                labelElem.innerText = option.label;
+
+                const inputElem = document.createElement('input');
+                inputElem.type = 'checkbox';
+                inputElem.value = option.value;
+                inputElem.className = 'optionCheckbox'; // クラス名を追加して後で選択を取得しやすくします
+
+                containerElem.appendChild(inputElem);
+                containerElem.appendChild(labelElem);
+                containerElem.appendChild(document.createElement('br')); // 改行を追加
             });
         }
         function submitData() {
         var adultCount = document.getElementById("adultCount").value;
         var childCount = document.getElementById("childCount").value;
-        var couponSetting = document.getElementById("couponSetting").value;
-        
-        google.script.run.appendFormData(adultCount, childCount, couponSetting);
+        var selectedOptions = Array.from(document.querySelectorAll('.optionCheckbox:checked')).map(checkbox => checkbox.value);
+
+        google.script.run.appendFormData(adultCount, childCount, selectedOptions);
         google.script.host.close();
         }
     </script>
