@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      /* ボタンを中央配置するためのスタイル */
+      .button-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh; /* ビューポートの高さに合わせる */
+      }
+
+      .button-container button {
+        margin: 10px;
+        width: 200px;
+        height: 50px;
+        text-align: center;
+        line-height: 50px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        background-color: #f8f8f8;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      .button-container button:hover {
+        background-color: #e0e0e0; /* ホバー時の背景色 */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="button-container">
+      <button onclick="loadNewEntryForm()">新規</button>
+      <button onclick="loadEdit()">オプション変更</button>
+      <button onclick="loadSettlementScanner()">清算</button>
+      <button onclick="loadSettlementScannerWithDiscount()">割引清算</button>
+      <button onclick="loadList()">一覧表示</button>
+      <button onclick="moveDataToDatabase()">データを保管</button>
+    </div>
+    <script>
+      function loadNewEntryForm() {
+        google.script.run.withSuccessHandler(function(html) {
+          document.open();
+          document.write(html);
+          document.close();
+        }).loadHtml('EntryForm.html');
+      }
+
+      function loadSettlementScanner() {
+        google.script.run.withSuccessHandler(function(html) {
+          document.open();
+          document.write(html);
+          document.close();
+        }).loadHtml('Camera.html');
+      }
+
+      function loadSettlementScannerWithDiscount() {
+        google.script.run.withSuccessHandler(function(html) {
+          document.open();
+          document.write(html);
+          document.close();
+        }).loadHtml('DiscountCamera.html');
+      }
+
+      function loadList() {
+        google.script.run.withSuccessHandler(function(html) {
+          document.open();
+          document.write(html);
+          document.close();
+        }).loadHtml('List.html');
+      }
+
+      function loadEdit() {
+        google.script.run.withSuccessHandler(function(html) {
+          document.open();
+          document.write(html);
+          document.close();
+        }).loadHtml('EditCamera.html');
+      }
+      function moveDataToDatabase() {
+        var confirmed = confirm('データをデータベースに移動しますか？');
+        if (confirmed) {
+          google.script.run
+            .withSuccessHandler(function(response) {
+              alert('データが正常に移動されました。');
+            })
+            .withFailureHandler(function(error) {
+              alert('エラーが発生しました: ' + error.message);
+            })
+            .moveDataToDatabase();
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -1,47 +1,230 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <base target="_top">
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+
+      .container {
+        margin: 0 auto;
+        width: 100%;
+        max-width: 800px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      label {
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+
+      input[type="number"], .optionContainer {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      .input-group {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .input-group label {
+        margin-right: 10px;
+        font-weight: bold;
+        width: 100px; /* ラベルの幅 */
+      }
+
+      .input-group input[type="number"] {
+        flex-grow: 1; /* 入力フィールドが残りのスペースを埋める */
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      /* ボタンの基本スタイル */
+      .submit-button {
+        background-color: #4CAF50; /* 緑色 */
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border: none;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+      }
+
+      /* ホバー時のスタイル */
+      .submit-button:hover {
+        background-color: #45a049;
+      }
+
+      /* 押下時のスタイル */
+      .submit-button:active {
+        background-color: #3e8e41;
+        box-shadow: 0 5px #666;
+        transform: translateY(4px);
+      }
+      .option-container {
+        display: flex;
+        flex-wrap: wrap; /* コンテンツがコンテナの幅を超えると改行される */
+      }
+
+      .option-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        width: 50%; /* コンテナの半分の幅に設定 */
+      }
+
+      .option-item label {
+        margin-right: 10px;
+        white-space: nowrap;
+      }
+
+      .option-item .option-label {
+        width: 100px; 
+      }
+
+      .option-item .option-number-label {
+        width: 40px;
+      }
+
+      .option-item input[type="checkbox"] {
+        margin-right: 10px;
+      }
+
+      .option-item .optionNumber {
+        width: 50px;
+        flex-grow: 0;
+      }
+      /* チェックボックスのカスタマイズ */
+      .optionCheckbox {
+        width: 20px; /* チェックボックスの幅 */
+        height: 20px; /* チェックボックスの高さ */
+        cursor: pointer; /* カーソルをポインターに変更 */
+        margin-right: 10px; /* チェックボックスとラベルの間の余白 */
+      }
+
+    </style>
+  </head>
   <body>
-    <div>
-      <label>大人人数:</label>
-      <input type="number" id="adultCount">
+    <div div class="container">
+      <div>
+        ・最初の画面に戻る場合はF5（画面更新）を行ってください
+      </div>
+      <div>
+        ・送信ボタン押下後はQRコード画面が表示されるまでしばらくお待ちください。
+      </div>
+        <div class="input-group">
+          <label for="adultCount">大人人数:</label>
+          <input type="number" id="adultCount">
+        </div>
+
+        <div class="input-group">
+          <label for="childCount">子供人数:</label>
+          <input type="number" id="childCount">
+        </div>
+      <div id="optionsContainer">
+          <!-- ここに動的にチェックボックスと数値入力フィールドが追加 -->
+      </div>
+      <button class="submit-button" onclick="submitData()">送信</button>
     </div>
-    <div>
-      <label>子供人数:</label>
-      <input type="number" id="childCount">
-    </div>
-    <div id="optionsContainer">
-        <!-- ここに動的にチェックボックスが追加 -->
-    </div>
-    <button onclick="submitData()">送信</button>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             google.script.run.withSuccessHandler(populateOptions).getOptions();
         });
         function populateOptions(optionList) {
-            const containerElem = document.getElementById('optionsContainer');
+          const containerElem = document.getElementById('optionsContainer');
+          containerElem.className = 'option-container'; // コンテナにクラスを追加
 
-            optionList.forEach(function(option) {
-                const labelElem = document.createElement('label');
-                labelElem.innerText = option.label;
+          optionList.forEach(function(option, index) {
+            const optionItem = document.createElement('div');
+            optionItem.className = 'option-item';
 
-                const inputElem = document.createElement('input');
-                inputElem.type = 'checkbox';
-                inputElem.value = option.value;
-                inputElem.className = 'optionCheckbox'; // クラス名を追加して後で選択を取得しやすくします
+            const labelCheckbox = document.createElement('label');
+            labelCheckbox.innerText = option.label;
+            labelCheckbox.htmlFor = 'optionCheckbox' + index;
+            labelCheckbox.className = 'option-label';
 
-                containerElem.appendChild(inputElem);
-                containerElem.appendChild(labelElem);
-                containerElem.appendChild(document.createElement('br')); // 改行を追加
+            const inputCheckbox = document.createElement('input');
+            inputCheckbox.type = 'checkbox';
+            inputCheckbox.id = 'optionCheckbox' + index;
+            inputCheckbox.className = 'optionCheckbox';
+
+            const labelNumber = document.createElement('label');
+            labelNumber.innerText = '個数: ';
+            labelNumber.htmlFor = 'optionNumber' + index;
+            labelNumber.className = 'option-number-label';
+
+            const inputNumber = document.createElement('input');
+            inputNumber.type = 'number';
+            inputNumber.id = 'optionNumber' + index;
+            inputNumber.className = 'optionNumber';
+            inputNumber.min = '0';
+            inputNumber.value = '0';
+            inputNumber.disabled = true;
+
+            inputCheckbox.addEventListener('change', function() {
+              inputNumber.disabled = !this.checked;
+              if (!this.checked) {
+                inputNumber.value = '0';
+              }
             });
-        }
-        function submitData() {
-        var adultCount = document.getElementById("adultCount").value;
-        var childCount = document.getElementById("childCount").value;
-        var selectedOptions = Array.from(document.querySelectorAll('.optionCheckbox:checked')).map(checkbox => checkbox.value);
 
-        google.script.run.appendFormData(adultCount, childCount, selectedOptions);
-        google.script.host.close();
+            optionItem.appendChild(labelCheckbox);
+            optionItem.appendChild(inputCheckbox);
+            optionItem.appendChild(labelNumber);
+            optionItem.appendChild(inputNumber);
+
+            containerElem.appendChild(optionItem);
+          });
         }
+
+        function submitData() {
+          var adultCount = document.getElementById("adultCount").value;
+          var childCount = document.getElementById("childCount").value;
+          var selectedOptions = [];          
+          var isValid = true; // バリデーション状態を追跡する変数
+
+          document.querySelectorAll('.optionCheckbox').forEach(function(checkbox, index) {
+            if (checkbox.checked) {
+              var optionLabel = document.querySelector('label[for="' + checkbox.id + '"]').innerText;
+              var optionValue = checkbox.value; // ここで `value` が空であれば、`value` 属性を設定する必要がある
+              var optionNumber = document.getElementById('optionNumber' + index).value;
+
+              // チェックボックスが有効で個数が0以下の場合、バリデーションエラーとする
+              if (optionNumber <= 0) {
+                isValid = false;
+                alert(optionLabel + ' の個数を正しく入力してください。');
+              }
+
+              // 配列にオブジェクトを追加
+              selectedOptions.push({
+                label: optionLabel,
+                value: optionValue,
+                count: optionNumber
+              });
+            }
+          });
+
+          // バリデーションエラーがない場合のみ送信処理を実行
+          if (isValid) {
+            google.script.run.withSuccessHandler(function(url) {
+              window.open(url, '_blank'); // 新しいタブでドキュメントを開く
+            }).appendFormData(adultCount, childCount, selectedOptions);
+          }
+        }
+
     </script>
   </body>
 </html>

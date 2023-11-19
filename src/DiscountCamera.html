@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      .container {
+        margin: 0 auto;
+        width: 100%;
+        max-width: 800px;
+      }
+
+      .input-group {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .input-group label {
+        margin-right: 10px;
+        font-weight: bold;
+        width: 100px;
+      }
+
+      .input-group input[type="number"] {
+        flex-grow: 1;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      .input-group .optionDropdown {
+        flex-grow: 1;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      .submit-button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border: none;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+      }
+
+      .submit-button:hover {
+        background-color: #45a049;
+      }
+
+      .submit-button:active {
+        background-color: #3e8e41;
+        box-shadow: 0 5px #666;
+        transform: translateY(4px);
+      }
+      .radio-group {
+        display: flex;
+        justify-content: space-between; /* 子要素を等間隔で配置 */
+        align-items: center; /* 子要素を垂直方向の中央に配置 */
+      }
+
+      .radio-label {
+        display: flex;
+        align-items: center; /* ラベル内の要素を垂直方向の中央に配置 */
+        justify-content: center; /* ラベル内の要素を水平方向の中央に配置 */
+        flex-grow: 1; /* 各ラベルが利用可能なスペースを均等に占有 */
+        margin: 0 5px; /* ラジオボタン間の余白を設定 */
+      }
+
+      .radio-button {
+        inline-size: 1.5rem;
+        block-size: 1.5rem;
+        margin-right: 5px; /* ラジオボタンとラベルのテキストの間の余白 */
+        margin-top: -3px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div>
+        ・最初の画面に戻る場合はF5（画面更新）を行ってください
+      </div>
+      <div class="input-group">
+        <label for="id">番号:</label>
+        <input type="number" id="id">
+      </div>
+      <button class="submit-button" onclick="submitData()">清算</button>
+      <h1>
+        <div id="linkContainer"></div>
+      </h1>
+      <div id="reader" style="width:340px;"></div>
+      <button id="sound">Sound ON (iOS)</button>
+      <div id="discountContainer" class="input-group">
+        <!-- セレクトボックスが動的に追加される場所 -->
+      </div>
+      <div id="discountScope" class="radio-group">
+        <label class="radio-label"><input class="radio-button" type="radio" name="discountScopeOption" value="1" checked>全員適用</label>
+        <label class="radio-label"><input class="radio-button" type="radio" name="discountScopeOption" value="2">大人のみ適用</label>
+        <label class="radio-label"><input class="radio-button" type="radio" name="discountScopeOption" value="3">子供のみ適用</label>
+      </div>
+      <div id="result"></div>
+      <script src="https://unpkg.com/html5-qrcode"></script>
+      <script>
+        let CURRENT_TEXT = '';
+
+        const append = (text) => {
+          document.querySelector('#result').innerHTML += `${text}<br>`; 
+        };
+
+        const onScanSuccess = (decodedText, decodedResult) => {
+          console.log('onScanSuccess', decodedText, CURRENT_TEXT);
+          // 数値への変換を試みる
+          const decodedNumber = parseInt(decodedText, 10);
+          let discountSelect = document.getElementById("discountSelect");
+          let selectedValue = parseInt(discountSelect.value);
+          let selectedLabel = discountSelect.options[discountSelect.selectedIndex].text;
+
+          let selectedDiscountScopeElem = document.querySelector('input[name="discountScopeOption"]:checked');
+          let selectedDiscountScopeValue = selectedDiscountScopeElem.value;
+          let selectedDiscountScopeLabel = selectedDiscountScopeElem.parentNode.innerText;
+
+          // 数値であるかチェックする
+          if (!isNaN(decodedNumber)) {
+            // CURRENT_TEXTが前回のスキャンと異なる値かどうかをチェック
+            if (CURRENT_TEXT !== decodedText) {
+              CURRENT_TEXT = decodedText;
+              append(decodedText);
+              document.getElementById('id').value = decodedNumber;
+              google.script.run.appendDiscountData(decodedNumber, selectedLabel, selectedDiscountScopeLabel);
+              // 渡す前に数値にキャストしてから関数に渡す
+              google.script.run.withSuccessHandler(function(url) {
+                createLink(url);
+                window.open(url, '_blank');
+              }).calculateSettlement(decodedNumber, selectedValue, selectedDiscountScopeLabel);
+            }
+          } else {
+            append(`"${decodedText}"は有効な数値ではありません。`);
+          }
+        };
+
+        const html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 240 });
+        html5QrcodeScanner.render(onScanSuccess);
+
+      </script>
+      <script>
+          function submitData() {
+            var id = parseInt(document.getElementById("id").value);
+            let discountSelect = document.getElementById("discountSelect");
+            let selectedValue = parseInt(discountSelect.value);
+            let selectedLabel = discountSelect.options[discountSelect.selectedIndex].text;
+
+            let selectedDiscountScopeElem = document.querySelector('input[name="discountScopeOption"]:checked');
+            let selectedDiscountScopeValue = selectedDiscountScopeElem.value;
+            let selectedDiscountScopeLabel = selectedDiscountScopeElem.parentNode.innerText;
+            google.script.run.appendDiscountData(id, selectedLabel, selectedDiscountScopeLabel);
+            google.script.run.withSuccessHandler(function(url) {
+              createLink(url);
+              window.open(url, '_blank');
+            }).calculateSettlement(id, selectedValue, selectedDiscountScopeLabel);
+          }
+          function createLink(url) {
+            const linkContainer = document.getElementById('linkContainer');
+            // すでにリンクが存在する場合は、それを削除
+            linkContainer.innerHTML = '';
+            // 新しいリンク要素を作成
+            const link = document.createElement('a');
+            link.href = url;
+            link.target = '_blank';  // 新しいタブで開くための属性
+            link.textContent = '清算結果を表示';  // リンクのテキスト
+            // コンテナにリンクを追加
+            linkContainer.appendChild(link);
+          }
+          function populateDiscounts(optionList) {
+              const containerElem = document.getElementById('discountContainer');
+
+              const selectElem = document.createElement('select');
+              selectElem.id = 'discountSelect';
+              selectElem.className = 'optionDropdown';
+
+              optionList.forEach(function(option) {
+                  const optionElem = document.createElement('option');
+                  optionElem.value = option.value;
+                  optionElem.innerText = option.label;
+                  selectElem.appendChild(optionElem);
+              });
+
+              containerElem.appendChild(selectElem);
+          }
+          google.script.run.withSuccessHandler(populateDiscounts).getDiscounts();
+      </script>
+    </div>
+  </body>
+</html>

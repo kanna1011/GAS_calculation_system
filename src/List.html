@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+
+      table {
+        border-collapse: collapse; /* セル間の境界線を1本にする */
+        width: 100%; /* テーブルの幅を100%に設定 */
+        margin-top: 20px; /* テーブルの上の余白 */
+        font-family: Arial, sans-serif;
+        font-size: 9px;
+      }
+
+      th, td {
+        border: 1px solid #ddd; /* セルの境界線の色と太さ */
+        padding: 8px; /* セル内のパディング */
+        text-align: left; /* セルのテキストを左揃え */
+      }
+
+      th {
+        background-color: #4CAF50; /* ヘッダーの背景色 */
+        color: white; /* ヘッダーのテキスト色 */
+      }
+
+      tr:nth-child(even) {
+        background-color: #f2f2f2; /* 偶数行の背景色 */
+      }
+
+      tr:hover {
+        background-color: #ddd; /* マウスホバー時の行の背景色 */
+      }
+
+      a {
+        color: #0645ad; /* リンクの色 */
+        text-decoration: none; /* 下線を消す */
+      }
+
+      a:hover {
+        text-decoration: underline; /* ホバー時に下線を表示 */
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      最初の画面に戻る場合はF5（画面更新）を行ってください
+    </div>
+    <div id="output">データをロード中...</div>
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        google.script.run.withSuccessHandler(buildTable).getSpreadsheetData();
+      });
+
+      // 取得したデータでテーブルを構築
+      function buildTable(data) {
+        console.log(data);
+        if (!data || data.length === 0) {
+          document.getElementById('output').innerHTML = 'データがありません。';
+          return;
+        }
+        var table = '<table border="1">'; // 枠線付きのテーブルを作成
+        data.forEach(function(row, index) {
+          table += '<tr>';
+          row.forEach(function(cell) {
+            // ヘッダー行の場合は<th>を使用、それ以外は<td>を使用
+            var cellTag = index === 0 ? 'th' : 'td';
+            // URLの場合はリンクを作成し、表示テキストを"URL"にする
+            var cellContent = (typeof cell === 'string' && cell.match(/^http(s)?:\/\//)) ?
+              `<a href="${cell}" target="_blank">URL</a>` : cell;
+            table += `<${cellTag}>${cellContent}</${cellTag}>`;
+          });
+          table += '</tr>';
+        });
+        table += '</table>';
+        document.getElementById('output').innerHTML = table;
+      }
+    </script>
+  </body>
+</html>
