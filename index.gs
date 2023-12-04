@@ -266,24 +266,46 @@ function createDocumentWithCalcData(id) {
     const formattedTotalPrice = totalPrice.toLocaleString();
     const formattedTotalPriceTax = totalPriceTax.toLocaleString();
   
-    body.appendParagraph("入室時間　　　　　　　: " + formattedEnterTime);
-    body.appendParagraph("退出時間　　　　　　　: " + formattedExitTime);
+    var enterLabelText = body.appendParagraph("入室時間　　　　　　: ");
+    var enterText = body.appendParagraph(formattedEnterTime);
+    var exitLabelText = body.appendParagraph("退出時間　　　　　　: ");
+    var exitText = body.appendParagraph(formattedExitTime);
     body.appendParagraph(" ");
-    body.appendParagraph("清算時間　　　　　　　: " + calcTime + "分");
+    var calcTimeText = body.appendParagraph("清算時間　　　　　　: " + calcTime + "分");
     body.appendParagraph(" ");
-    body.appendParagraph("大人の数　　　　　　　: " + adultCount + "人");
-    body.appendParagraph("子供の数　　　　　　　: " + childCount + "人");
+    var adultCountText = body.appendParagraph("大人の数　　　　　　: " + adultCount + "人");
+    var childCountText = body.appendParagraph("子供の数　　　　　　: " + childCount + "人");
     body.appendParagraph(" ");
-    body.appendParagraph("選択されたオプション　: " + option);
+    var optionLabelText = body.appendParagraph("選択されたオプション：");
+    var optionText = body.appendParagraph(option);
     body.appendParagraph(" ");
-    body.appendParagraph("大人の料金　　　　　　: " + formattedAdultPrice + "円");
-    body.appendParagraph("子供の料金　　　　　　: " + formattedChildPrice + "円");
-    body.appendParagraph("オプション料金　　　　: " + formattedOptionPrice + "円");
-    body.appendParagraph("割引料金　　　　　　　: " + formattedDiscountPrice + "円");
-    body.appendParagraph("---------------------------------------------------");
-    body.appendParagraph("合計料金　　　　　　　: " + formattedTotalPrice + "円");
-    body.appendParagraph("税込料金　　　　　　　: " + formattedTotalPriceTax + "円");
-    
+    var adultPriceText = body.appendParagraph("大人の料金　　　　　: " + formattedAdultPrice + "円");
+    var childPriceText = body.appendParagraph("子供の料金　　　　　: " + formattedChildPrice + "円");
+    var optionPriceText = body.appendParagraph("オプション料金　　　: " + formattedOptionPrice + "円");
+    var discountPriceText = body.appendParagraph("割引料金　　　　　　: " + formattedDiscountPrice + "円");
+    var dotText = body.appendParagraph("----------------------------------------------");
+    var totalPriceText = body.appendParagraph("合計料金　　　　　　: " + formattedTotalPrice + "円");
+    var totalPriceTaxText = body.appendParagraph("税込料金　　　　　　: " + formattedTotalPriceTax + "円");
+    // テキストサイズ設定
+    const textFontSize = 27;
+    enterLabelText.editAsText().setFontSize(textFontSize);
+    enterText.editAsText().setFontSize(textFontSize);
+    exitLabelText.editAsText().setFontSize(textFontSize);
+    exitText.editAsText().setFontSize(textFontSize);
+    calcTimeText.editAsText().setFontSize(textFontSize);
+    adultCountText.editAsText().setFontSize(textFontSize);
+    childCountText.editAsText().setFontSize(textFontSize);
+    optionText.editAsText().setFontSize(textFontSize);
+    optionLabelText.editAsText().setFontSize(textFontSize);
+    adultPriceText.editAsText().setFontSize(textFontSize);
+    childPriceText.editAsText().setFontSize(textFontSize);
+    optionPriceText.editAsText().setFontSize(textFontSize);
+    discountPriceText.editAsText().setFontSize(textFontSize);
+    dotText.editAsText().setFontSize(textFontSize);
+    dotText.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
+    totalPriceText.editAsText().setFontSize(textFontSize);
+    totalPriceTaxText.editAsText().setFontSize(textFontSize);
+
     const file = DriveApp.getFileById(doc.getId());
     file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
   
@@ -370,14 +392,18 @@ function createDocumentWithQrCodeAndData(nextRowNumber, formattedDate) {
     const doc = DocumentApp.create('QR Code for ' + nextRowNumber);
     const body = doc.getBody();
     const qrBlob = generateQrCode(nextRowNumber.toString());
-    body.appendImage(qrBlob).setHeight(150).setWidth(150);
-    body.appendParagraph("入室時間: " + formattedDate);
+    body.appendImage(qrBlob).setHeight(600).setWidth(600);
+    var paragraph = body.appendParagraph("入室時間: " + formattedDate);
+    paragraph.setAlignment(DocumentApp.HorizontalAlignment.CENTER); // 中央揃え
+    paragraph.editAsText().setFontSize(30);
 
+    // ファイルの共有設定
     const file = DriveApp.getFileById(doc.getId());
     file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
 
     return doc.getUrl();
 }
+
 
 /**
  * QRコードを作成
