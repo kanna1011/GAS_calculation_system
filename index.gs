@@ -165,6 +165,7 @@ function calculateSettlement(id, discount = null, target = null) {
     if (diff > maxTime) {
         diff = maxTime;
     }
+    // 計算用初期値
     let totalPrice = 0;
     let adultPrice = 0;
     let childPrice = 0;
@@ -174,13 +175,13 @@ function calculateSettlement(id, discount = null, target = null) {
     let discountAdultPrice = 0;
     let discountChildPrice = 0;
     let discountTotalPrice = 0;
+    // 差分確認
     if (diff <= minTime) {
         diff = minTime;
         adultTotalPrice = adultCount * minPrice;
         childTotalPrice = childCount * (minPrice / 2);
         totalPrice = adultTotalPrice + childTotalPrice;
-    }
-    else {
+    } else {
         let minutesDiff = diff - minTime;
         minutesDiff = Math.ceil(minutesDiff / billingInterval);
         diff = minTime + (minutesDiff * billingInterval);
@@ -198,16 +199,30 @@ function calculateSettlement(id, discount = null, target = null) {
         }
         totalPrice = adultTotalPrice + childTotalPrice;
     }
+    // オプション処理
     if (options) {
       optionsTotal = calculateOptionsTotal(settingsSheet, options);
       totalPrice = totalPrice + optionsTotal;
     }
+    // 割引処理
     if (discount == null) {
         const discountValue = findRowByDiscountValue(settingsSheet, getDiscount);
         discount = discountValue;
         target = getDiscountTarget;
     }
     if (discount != null) {
+      if (diff <= ( discount * billingInterval)) {
+        if (target == '大人のみ適用') {
+          discountAdultPrice = adultTotalPrice;
+        } else if (target == '子供のみ適用') {
+          discountChildPrice = childTotalPrice;
+        } else {
+          discountAdultPrice = adultTotalPrice;
+          discountChildPrice = childTotalPrice;
+        }
+        discountTotalPrice = discountAdultPrice + discountChildPrice;
+        totalPrice = totalPrice - discountTotalPrice;
+      } else {
         if (target == '大人のみ適用') {
           discountAdultPrice = (adultCount * adultPricePerMinute) * discount;
         } else if (target == '子供のみ適用') {
@@ -217,8 +232,13 @@ function calculateSettlement(id, discount = null, target = null) {
           discountChildPrice = (childCount * childPricePerMinute) * discount;
         }
         discountTotalPrice = discountAdultPrice + discountChildPrice;
+        if (totalPrice < discountTotalPrice) {
+          discountTotalPrice = totalPrice;
+        }
         totalPrice = totalPrice - discountTotalPrice;
+      }
     }
+    // シート反映
     taxTotalPrice = Math.round(totalPrice * (1 + tax));
     sheet.getRange(rowIndex, 6).setValue(diff);
     sheet.getRange(rowIndex, 7).setValue(adultTotalPrice);
