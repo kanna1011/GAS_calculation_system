@@ -79,9 +79,36 @@
         margin-right: 5px; /* ラジオボタンとラベルのテキストの間の余白 */
         margin-top: -3px;
       }
+    /* モーダルのスタイル */
+    .modal {
+      display: none; /* 最初は非表示 */
+      position: fixed; /* ブラウザの表示領域を基準にする */
+      z-index: 1; /* 最前面に表示 */
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto; /* コンテンツがはみ出した場合にスクロールバーを表示 */
+      background-color: rgba(0,0,0,0.5); /* 背景を半透明にする */
+    }
+    /* モーダルコンテンツのスタイル */
+    .modal-content {
+      background-color: #fefefe; /* 背景色 */
+      margin: 15% auto; /* 画面中央に配置 */
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 600px;
+    }
     </style>
   </head>
   <body>
+    <!-- モーダル -->
+    <div id="myModal" class="modal">
+      <div class="modal-content">
+        <p>処理中...</p>
+      </div>
+    </div>
     <div class="container">
       <div>
         ・最初の画面に戻る場合はF5（画面更新）を行ってください
@@ -94,8 +121,6 @@
       <h1>
         <div id="linkContainer"></div>
       </h1>
-      <div id="reader" style="width:340px;"></div>
-      <button id="sound">Sound ON (iOS)</button>
       <div id="discountContainer" class="input-group">
         <!-- セレクトボックスが動的に追加される場所 -->
       </div>
@@ -105,51 +130,9 @@
         <label class="radio-label"><input class="radio-button" type="radio" name="discountScopeOption" value="3">子供のみ適用</label>
       </div>
       <div id="result"></div>
-      <script src="https://unpkg.com/html5-qrcode"></script>
-      <script>
-        let CURRENT_TEXT = '';
-
-        const append = (text) => {
-          document.querySelector('#result').innerHTML += `${text}<br>`; 
-        };
-
-        const onScanSuccess = (decodedText, decodedResult) => {
-          console.log('onScanSuccess', decodedText, CURRENT_TEXT);
-          // 数値への変換を試みる
-          const decodedNumber = parseInt(decodedText, 10);
-          let discountSelect = document.getElementById("discountSelect");
-          let selectedValue = parseInt(discountSelect.value);
-          let selectedLabel = discountSelect.options[discountSelect.selectedIndex].text;
-
-          let selectedDiscountScopeElem = document.querySelector('input[name="discountScopeOption"]:checked');
-          let selectedDiscountScopeValue = selectedDiscountScopeElem.value;
-          let selectedDiscountScopeLabel = selectedDiscountScopeElem.parentNode.innerText;
-
-          // 数値であるかチェックする
-          if (!isNaN(decodedNumber)) {
-            // CURRENT_TEXTが前回のスキャンと異なる値かどうかをチェック
-            if (CURRENT_TEXT !== decodedText) {
-              CURRENT_TEXT = decodedText;
-              append(decodedText);
-              document.getElementById('id').value = decodedNumber;
-              google.script.run.appendDiscountData(decodedNumber, selectedLabel, selectedDiscountScopeLabel);
-              // 渡す前に数値にキャストしてから関数に渡す
-              google.script.run.withSuccessHandler(function(url) {
-                createLink(url);
-                window.open(url, '_blank');
-              }).calculateSettlement(decodedNumber, selectedValue, selectedDiscountScopeLabel);
-            }
-          } else {
-            append(`"${decodedText}"は有効な数値ではありません。`);
-          }
-        };
-
-        const html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 240 });
-        html5QrcodeScanner.render(onScanSuccess);
-
-      </script>
       <script>
           function submitData() {
+            showModal();
             var id = parseInt(document.getElementById("id").value);
             let discountSelect = document.getElementById("discountSelect");
             let selectedValue = parseInt(discountSelect.value);
@@ -160,6 +143,7 @@
             let selectedDiscountScopeLabel = selectedDiscountScopeElem.parentNode.innerText;
             google.script.run.appendDiscountData(id, selectedLabel, selectedDiscountScopeLabel);
             google.script.run.withSuccessHandler(function(url) {
+              hideModal();
               createLink(url);
               window.open(url, '_blank');
             }).calculateSettlement(id, selectedValue, selectedDiscountScopeLabel);
@@ -193,6 +177,16 @@
               containerElem.appendChild(selectElem);
           }
           google.script.run.withSuccessHandler(populateDiscounts).getDiscounts();
+          
+        // モーダルを表示する関数
+        function showModal() {
+          document.getElementById("myModal").style.display = "block";
+        }
+        
+        // モーダルを非表示にする関数
+        function hideModal() {
+          document.getElementById("myModal").style.display = "none";
+        }
       </script>
     </div>
   </body>

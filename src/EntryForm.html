@@ -24,8 +24,8 @@
 
       input[type="number"], .optionContainer {
         width: 100%;
-        padding: 8px;
-        margin-bottom: 10px;
+        padding: 10px;
+        margin-bottom: 15px;
         border: 1px solid #ccc;
         border-radius: 4px;
       }
@@ -115,15 +115,44 @@
         margin-right: 10px; /* チェックボックスとラベルの間の余白 */
       }
 
+    /* モーダルのスタイル */
+    .modal {
+      display: none; /* 最初は非表示 */
+      position: fixed; /* ブラウザの表示領域を基準にする */
+      z-index: 1; /* 最前面に表示 */
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto; /* コンテンツがはみ出した場合にスクロールバーを表示 */
+      background-color: rgba(0,0,0,0.5); /* 背景を半透明にする */
+    }
+
+    /* モーダルコンテンツのスタイル */
+    .modal-content {
+      background-color: #fefefe; /* 背景色 */
+      margin: 15% auto; /* 画面中央に配置 */
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 600px;
+    }
+
     </style>
   </head>
   <body>
+    <!-- モーダル -->
+    <div id="myModal" class="modal">
+      <div class="modal-content">
+        <p>処理中...</p>
+      </div>
+    </div>
     <div div class="container">
       <div>
         ・最初の画面に戻る場合はF5（画面更新）を行ってください
       </div>
       <div>
-        ・送信ボタン押下後はQRコード画面が表示されるまでしばらくお待ちください。
+        ・送信ボタン押下後はドキュメント画面が表示されるまでしばらくお待ちください。
       </div>
         <div class="input-group">
           <label for="adultCount">大人人数:</label>
@@ -140,91 +169,102 @@
       <button class="submit-button" onclick="submitData()">送信</button>
     </div>
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            google.script.run.withSuccessHandler(populateOptions).getOptions();
-        });
-        function populateOptions(optionList) {
-          const containerElem = document.getElementById('optionsContainer');
-          containerElem.className = 'option-container'; // コンテナにクラスを追加
+      document.addEventListener("DOMContentLoaded", function() {
+          google.script.run.withSuccessHandler(populateOptions).getOptions();
+      });
+      function populateOptions(optionList) {
+        const containerElem = document.getElementById('optionsContainer');
+        containerElem.className = 'option-container'; // コンテナにクラスを追加
 
-          optionList.forEach(function(option, index) {
-            const optionItem = document.createElement('div');
-            optionItem.className = 'option-item';
+        optionList.forEach(function(option, index) {
+          const optionItem = document.createElement('div');
+          optionItem.className = 'option-item';
 
-            const labelCheckbox = document.createElement('label');
-            labelCheckbox.innerText = option.label;
-            labelCheckbox.htmlFor = 'optionCheckbox' + index;
-            labelCheckbox.className = 'option-label';
+          const labelCheckbox = document.createElement('label');
+          labelCheckbox.innerText = option.label;
+          labelCheckbox.htmlFor = 'optionCheckbox' + index;
+          labelCheckbox.className = 'option-label';
 
-            const inputCheckbox = document.createElement('input');
-            inputCheckbox.type = 'checkbox';
-            inputCheckbox.id = 'optionCheckbox' + index;
-            inputCheckbox.className = 'optionCheckbox';
+          const inputCheckbox = document.createElement('input');
+          inputCheckbox.type = 'checkbox';
+          inputCheckbox.id = 'optionCheckbox' + index;
+          inputCheckbox.className = 'optionCheckbox';
 
-            const labelNumber = document.createElement('label');
-            labelNumber.innerText = '個数: ';
-            labelNumber.htmlFor = 'optionNumber' + index;
-            labelNumber.className = 'option-number-label';
+          const labelNumber = document.createElement('label');
+          labelNumber.innerText = '個数: ';
+          labelNumber.htmlFor = 'optionNumber' + index;
+          labelNumber.className = 'option-number-label';
 
-            const inputNumber = document.createElement('input');
-            inputNumber.type = 'number';
-            inputNumber.id = 'optionNumber' + index;
-            inputNumber.className = 'optionNumber';
-            inputNumber.min = '0';
-            inputNumber.value = '0';
-            inputNumber.disabled = true;
+          const inputNumber = document.createElement('input');
+          inputNumber.type = 'number';
+          inputNumber.id = 'optionNumber' + index;
+          inputNumber.className = 'optionNumber';
+          inputNumber.min = '0';
+          inputNumber.value = '0';
+          inputNumber.disabled = true;
 
-            inputCheckbox.addEventListener('change', function() {
-              inputNumber.disabled = !this.checked;
-              if (!this.checked) {
-                inputNumber.value = '0';
-              }
-            });
-
-            optionItem.appendChild(labelCheckbox);
-            optionItem.appendChild(inputCheckbox);
-            optionItem.appendChild(labelNumber);
-            optionItem.appendChild(inputNumber);
-
-            containerElem.appendChild(optionItem);
-          });
-        }
-
-        function submitData() {
-          var adultCount = document.getElementById("adultCount").value;
-          var childCount = document.getElementById("childCount").value;
-          var selectedOptions = [];          
-          var isValid = true; // バリデーション状態を追跡する変数
-
-          document.querySelectorAll('.optionCheckbox').forEach(function(checkbox, index) {
-            if (checkbox.checked) {
-              var optionLabel = document.querySelector('label[for="' + checkbox.id + '"]').innerText;
-              var optionValue = checkbox.value; // ここで `value` が空であれば、`value` 属性を設定する必要がある
-              var optionNumber = document.getElementById('optionNumber' + index).value;
-
-              // チェックボックスが有効で個数が0以下の場合、バリデーションエラーとする
-              if (optionNumber <= 0) {
-                isValid = false;
-                alert(optionLabel + ' の個数を正しく入力してください。');
-              }
-
-              // 配列にオブジェクトを追加
-              selectedOptions.push({
-                label: optionLabel,
-                value: optionValue,
-                count: optionNumber
-              });
+          inputCheckbox.addEventListener('change', function() {
+            inputNumber.disabled = !this.checked;
+            if (!this.checked) {
+              inputNumber.value = '0';
             }
           });
 
-          // バリデーションエラーがない場合のみ送信処理を実行
-          if (isValid) {
-            google.script.run.withSuccessHandler(function(url) {
-              window.open(url, '_blank'); // 新しいタブでドキュメントを開く
-            }).appendFormData(adultCount, childCount, selectedOptions);
-          }
-        }
+          optionItem.appendChild(labelCheckbox);
+          optionItem.appendChild(inputCheckbox);
+          optionItem.appendChild(labelNumber);
+          optionItem.appendChild(inputNumber);
 
+          containerElem.appendChild(optionItem);
+        });
+      }
+
+      function submitData() {
+        showModal();
+        var adultCount = document.getElementById("adultCount").value;
+        var childCount = document.getElementById("childCount").value;
+        var selectedOptions = [];          
+        var isValid = true; // バリデーション状態を追跡する変数
+
+        document.querySelectorAll('.optionCheckbox').forEach(function(checkbox, index) {
+          if (checkbox.checked) {
+            var optionLabel = document.querySelector('label[for="' + checkbox.id + '"]').innerText;
+            var optionValue = checkbox.value; // ここで `value` が空であれば、`value` 属性を設定する必要がある
+            var optionNumber = document.getElementById('optionNumber' + index).value;
+
+            // チェックボックスが有効で個数が0以下の場合、バリデーションエラーとする
+            if (optionNumber <= 0) {
+              isValid = false;
+              alert(optionLabel + ' の個数を正しく入力してください。');
+            }
+
+            // 配列にオブジェクトを追加
+            selectedOptions.push({
+              label: optionLabel,
+              value: optionValue,
+              count: optionNumber
+            });
+          }
+        });
+
+        // バリデーションエラーがない場合のみ送信処理を実行
+        if (isValid) {
+          google.script.run.withSuccessHandler(function(url) {
+            hideModal();
+            window.open(url, '_blank'); // 新しいタブでドキュメントを開く
+          }).appendFormData(adultCount, childCount, selectedOptions);
+        }
+      }
+
+      // モーダルを表示する関数
+      function showModal() {
+        document.getElementById("myModal").style.display = "block";
+      }
+      
+      // モーダルを非表示にする関数
+      function hideModal() {
+        document.getElementById("myModal").style.display = "none";
+      }
     </script>
   </body>
 </html>

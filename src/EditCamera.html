@@ -1,267 +1,266 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <base target="_top">
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-      }
+<head>
+  <base target="_top">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
 
-      .container {
-        margin: 0 auto;
-        width: 100%;
-        max-width: 800px;
-      }
+    .container {
+      margin: 0 auto;
+      width: 100%;
+      max-width: 800px;
+    }
 
-      .input-group {
-        display: flex;
-        align-items: center;
-        margin-bottom: 20px;
-      }
+    .input-group {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
 
-      .input-group label {
-        margin-right: 10px;
-        font-weight: bold;
-        width: 100px; /* ラベルの幅 */
-      }
+    .input-group label {
+      margin-right: 10px;
+      font-weight: bold;
+      width: 100px; /* ラベルの幅 */
+    }
 
-      .input-group input[type="number"] {
-        flex-grow: 1; /* 入力フィールドが残りのスペースを埋める */
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-      }
+    .input-group input[type="number"] {
+      flex-grow: 1; /* 入力フィールドが残りのスペースを埋める */
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
 
-      .submit-button {
-        background-color: #4CAF50; /* 緑色 */
-        color: white;
-        padding: 15px 32px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 16px;
-        margin: 4px 2px;
-        cursor: pointer;
-        border: none;
-        border-radius: 4px;
-        transition: background-color 0.3s ease;
-      }
+    .submit-button {
+      background-color: #4CAF50; /* 緑色 */
+      color: white;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 4px 2px;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+    }
 
-      .submit-button:hover {
-        background-color: #45a049;
-      }
+    .submit-button:hover {
+      background-color: #45a049;
+    }
 
-      .submit-button:active {
-        background-color: #3e8e41;
-        box-shadow: 0 5px #666;
-        transform: translateY(4px);
-      }
+    .submit-button:active {
+      background-color: #3e8e41;
+      box-shadow: 0 5px #666;
+      transform: translateY(4px);
+    }
 
-      .option-container {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between; /* 項目間のスペースを均等に */
-      }
+    .option-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between; /* 項目間のスペースを均等に */
+    }
 
-      .option-item {
-        display: flex;
-        align-items: center;
-        flex-basis: calc(50% - 10px); /* 2列レイアウトのための幅 */
-        margin-bottom: 10px;
-      }
+    .option-item {
+      display: flex;
+      align-items: center;
+      flex-basis: calc(50% - 10px); /* 2列レイアウトのための幅 */
+      margin-bottom: 10px;
+    }
 
-      .option-label {
-        margin-right: 5px; /* ラベルとチェックボックスの間に余白を設定 */
-      }
+    .option-label {
+      margin-right: 5px; /* ラベルとチェックボックスの間に余白を設定 */
+    }
 
-      .optionCheckbox {
-        margin-right: 5px; /* チェックボックスと数値入力フィールドの間に余白を設定 */
-      }
+    .optionCheckbox {
+      margin-right: 5px; /* チェックボックスと数値入力フィールドの間に余白を設定 */
+    }
 
-      .option-number-label {
-        margin-right: 5px; /* 数値ラベルと入力フィールドの間に余白を設定 */
-      }
+    .option-number-label {
+      margin-right: 5px; /* 数値ラベルと入力フィールドの間に余白を設定 */
+    }
 
-      .optionNumber {
-        width: 50px; /* 数値入力フィールドの幅を設定 */
-      }
+    .optionNumber {
+      width: 50px; /* 数値入力フィールドの幅を設定 */
+    }
 
-      /* 追加のスタイル */
-      .option-label, .option-number-label {
-        min-width: 100px; /* ラベルの最小幅 */
-      }
+    /* 追加のスタイル */
+    .option-label, .option-number-label {
+      min-width: 100px; /* ラベルの最小幅 */
+    }
 
-      .optionNumber {
-        width: 50px; /* 入力フィールドの幅 */
-        margin-bottom: 10px; /* 入力フィールドの下の余白 */
-      }
+    .optionNumber {
+      width: 50px; /* 入力フィールドの幅 */
+      margin-bottom: 10px; /* 入力フィールドの下の余白 */
+    }
 
 
-      .optionCheckbox {
-        width: 20px; /* チェックボックスの幅 */
-        height: 20px; /* チェックボックスの高さ */
-        cursor: pointer; /* カーソルをポインターに変更 */
-        margin-right: 10px; /* チェックボックスとラベルの間の余白 */
-      }
+    .optionCheckbox {
+      width: 20px; /* チェックボックスの幅 */
+      height: 20px; /* チェックボックスの高さ */
+      cursor: pointer; /* カーソルをポインターに変更 */
+      margin-right: 10px; /* チェックボックスとラベルの間の余白 */
+    }
 
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <div>
-        ・最初の画面に戻る場合はF5（画面更新）を行ってください
-      </div>
-      <div>
-        ・適用ボタン押下後はしばらくお待ちください。
-      </div>
-      <h1>
-        <div id="resultContainer"></div>
-      </h1>
-      <div class="input-group">
-        <label for="id">番号:</label>
-        <input type="number" id="id">
-      </div>
-      <button class="submit-button" onclick="submitData()">指定番号の編集画面表示</button>
-      <div id="optionsContainer" class="option-container"></div>
-      <button id="applyEditButton" class="submit-button" onclick="editData()" style="display: none;">オプションの変更を適用</button>
-      <div id="reader" style="width:340px;"></div>
-      <div id="result"></div>
-      <script src="https://unpkg.com/html5-qrcode"></script>
-      <script>
-        let CURRENT_TEXT = '';
-
-        const append = (text) => {
-          document.querySelector('#result').innerHTML += `${text}<br>`; 
-        };
-
-        const onScanSuccess = (decodedText, decodedResult) => {
-          console.log('onScanSuccess', decodedText, CURRENT_TEXT);
-          // 数値への変換を試みる
-          const decodedNumber = parseInt(decodedText, 10);
-
-          // 数値であるかチェックする
-          if (!isNaN(decodedNumber)) {
-            // CURRENT_TEXTが前回のスキャンと異なる値かどうかをチェック
-            if (CURRENT_TEXT !== decodedText) {
-              CURRENT_TEXT = decodedText;
-              append(decodedText);
-              document.getElementById('id').value = decodedNumber;
-            }
-          } else {
-            append(`"${decodedText}"は有効な数値ではありません。`);
-          }
-        };
-
-        const html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 240 });
-        html5QrcodeScanner.render(onScanSuccess);
-
-      </script>
-      <script>
-        function submitData() {
-          var id = parseInt(document.getElementById("id").value);
-          google.script.run.withSuccessHandler(initializeForm).prepareDataForEditForm(id);
-        }
-        function initializeForm(options) {
-          const containerElem = document.getElementById('optionsContainer');
-          containerElem.innerHTML = '';
-          const optionsData = options.optionsData || [];
-          const settingOptions = options.settingOptions.map(option => option[0]);
-
-          settingOptions.forEach((option, index) => {
-            const matchedOption = optionsData.find(o => o.label === option);
-            const isChecked = matchedOption !== undefined;
-            const count = isChecked ? matchedOption.count : '0';
-
-            const optionItem = document.createElement('div');
-            optionItem.className = 'option-item';
-
-            const labelCheckbox = document.createElement('label');
-            labelCheckbox.innerText = option;
-            labelCheckbox.htmlFor = 'optionCheckbox' + index;
-            labelCheckbox.className = 'option-label';
-
-            const inputCheckbox = document.createElement('input');
-            inputCheckbox.type = 'checkbox';
-            inputCheckbox.id = 'optionCheckbox' + index;
-            inputCheckbox.className = 'optionCheckbox';
-            inputCheckbox.checked = isChecked;
-
-            const labelNumber = document.createElement('label');
-            labelNumber.innerText = '個数: ';
-            labelNumber.htmlFor = 'optionNumber' + index;
-            labelNumber.className = 'option-number-label';
-
-            const inputNumber = document.createElement('input');
-            inputNumber.type = 'number';
-            inputNumber.id = 'optionNumber' + index;
-            inputNumber.className = 'optionNumber';
-            inputNumber.value = count;
-            inputNumber.min = '0';
-            inputNumber.disabled = !isChecked;
-
-            inputCheckbox.addEventListener('change', function() {
-              inputNumber.disabled = !this.checked;
-              if (!this.checked) {
-                inputNumber.value = '0';
-              }
-            });
-
-            optionItem.appendChild(labelCheckbox);
-            optionItem.appendChild(inputCheckbox);
-            optionItem.appendChild(labelNumber);
-            optionItem.appendChild(inputNumber);
-            
-            containerElem.appendChild(optionItem);
-
-            const numberContainer = document.createElement('div');
-            numberContainer.className = 'number-container';
-            numberContainer.appendChild(labelNumber);
-            numberContainer.appendChild(inputNumber);
-
-            optionItem.appendChild(labelCheckbox);
-            optionItem.appendChild(inputCheckbox);
-            optionItem.appendChild(numberContainer); // ラベルと入力フィールドを包含するコンテナを追加
-            
-            containerElem.appendChild(optionItem);
-          });
-
-          document.getElementById('applyEditButton').style.display = 'block';
-        }
-        function editData() {
-          var id = parseInt(document.getElementById("id").value);
-          var selectedOptions = [];
-          var isValid = true; // バリデーション状態を追跡する変数
-
-          document.querySelectorAll('.optionCheckbox').forEach(function(checkbox, index) {
-            if (checkbox.checked) {
-              var optionLabel = document.querySelector('label[for="' + checkbox.id + '"]').innerText;
-              var optionNumber = document.getElementById('optionNumber' + index).value;
-
-              // チェックボックスが有効で個数が0以下の場合、バリデーションエラーとする
-              if (optionNumber <= 0) {
-                isValid = false;
-                alert(optionLabel + ' の個数を正しく入力してください。');
-              }
-
-              selectedOptions.push({
-                label: optionLabel,
-                count: optionNumber
-              });
-            }
-          });
-
-          // バリデーションエラーがない場合のみ送信処理を実行
-          if (isValid) {
-            google.script.run.withSuccessHandler(showSuccessMessage).editOptions(id, selectedOptions);
-          }
-        }
-
-        function showSuccessMessage() {
-          const resultContainer = document.getElementById('resultContainer');
-          resultContainer.innerHTML = 'オプションの変更が適用されました';
-          resultContainer.style.color = 'green'; // 成功メッセージの色を緑に設定
-        }
-      </script>
+    /* モーダルのスタイル */
+    .modal {
+      display: none; /* 最初は非表示 */
+      position: fixed; /* ブラウザの表示領域を基準にする */
+      z-index: 1; /* 最前面に表示 */
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto; /* コンテンツがはみ出した場合にスクロールバーを表示 */
+      background-color: rgba(0,0,0,0.5); /* 背景を半透明にする */
+    }
+    /* モーダルコンテンツのスタイル */
+    .modal-content {
+      background-color: #fefefe; /* 背景色 */
+      margin: 15% auto; /* 画面中央に配置 */
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 600px;
+    }
+  </style>
+</head>
+<body>
+  <!-- モーダル -->
+  <div id="myModal" class="modal">
+    <div class="modal-content">
+      <p>処理中...</p>
     </div>
-  </body>
+  </div>
+  <div class="container">
+    <div>
+      ・最初の画面に戻る場合はF5（画面更新）を行ってください
+    </div>
+    <div>
+      ・適用ボタン押下後はしばらくお待ちください。
+    </div>
+    <h1>
+      <div id="resultContainer"></div>
+    </h1>
+    <div class="input-group">
+      <label for="id">番号:</label>
+      <input type="number" id="id">
+    </div>
+    <button class="submit-button" onclick="submitData()">指定番号の編集画面表示</button>
+    <div id="optionsContainer" class="option-container"></div>
+    <button id="applyEditButton" class="submit-button" onclick="editData()" style="display: none;">オプションの変更を適用</button>
+    <div id="result"></div>
+    <script>
+      function submitData() {
+        var id = parseInt(document.getElementById("id").value);
+        google.script.run.withSuccessHandler(initializeForm).prepareDataForEditForm(id);
+      }
+      function initializeForm(options) {
+        const containerElem = document.getElementById('optionsContainer');
+        containerElem.innerHTML = '';
+        const optionsData = options.optionsData || [];
+        const settingOptions = options.settingOptions.map(option => option[0]);
+
+        settingOptions.forEach((option, index) => {
+          const matchedOption = optionsData.find(o => o.label === option);
+          const isChecked = matchedOption !== undefined;
+          const count = isChecked ? matchedOption.count : '0';
+
+          const optionItem = document.createElement('div');
+          optionItem.className = 'option-item';
+
+          const labelCheckbox = document.createElement('label');
+          labelCheckbox.innerText = option;
+          labelCheckbox.htmlFor = 'optionCheckbox' + index;
+          labelCheckbox.className = 'option-label';
+
+          const inputCheckbox = document.createElement('input');
+          inputCheckbox.type = 'checkbox';
+          inputCheckbox.id = 'optionCheckbox' + index;
+          inputCheckbox.className = 'optionCheckbox';
+          inputCheckbox.checked = isChecked;
+
+          const labelNumber = document.createElement('label');
+          labelNumber.innerText = '個数: ';
+          labelNumber.htmlFor = 'optionNumber' + index;
+          labelNumber.className = 'option-number-label';
+
+          const inputNumber = document.createElement('input');
+          inputNumber.type = 'number';
+          inputNumber.id = 'optionNumber' + index;
+          inputNumber.className = 'optionNumber';
+          inputNumber.value = count;
+          inputNumber.min = '0';
+          inputNumber.disabled = !isChecked;
+
+          inputCheckbox.addEventListener('change', function() {
+            inputNumber.disabled = !this.checked;
+            if (!this.checked) {
+              inputNumber.value = '0';
+            }
+          });
+
+          optionItem.appendChild(labelCheckbox);
+          optionItem.appendChild(inputCheckbox);
+          optionItem.appendChild(labelNumber);
+          optionItem.appendChild(inputNumber);
+          
+          containerElem.appendChild(optionItem);
+        });
+
+        document.getElementById('applyEditButton').style.display = 'block';
+      }
+      function editData() {
+        showModal();
+        var id = parseInt(document.getElementById("id").value);
+        var selectedOptions = [];
+        var isValid = true; // バリデーション状態を追跡する変数
+
+        document.querySelectorAll('.optionCheckbox').forEach(function(checkbox, index) {
+          if (checkbox.checked) {
+            var optionLabel = document.querySelector('label[for="' + checkbox.id + '"]').innerText;
+            var optionNumber = document.getElementById('optionNumber' + index).value;
+
+            // チェックボックスが有効で個数が0以下の場合、バリデーションエラーとする
+            if (optionNumber <= 0) {
+              isValid = false;
+              alert(optionLabel + ' の個数を正しく入力してください。');
+            }
+
+            selectedOptions.push({
+              label: optionLabel,
+              count: optionNumber
+            });
+          }
+        });
+
+        // バリデーションエラーがない場合のみ送信処理を実行
+        if (isValid) {
+          google.script.run.withSuccessHandler(function() {
+            hideModal();
+            showSuccessMessage();
+          }).editOptions(id, selectedOptions);
+        }
+      }
+
+      function showSuccessMessage() {
+        const resultContainer = document.getElementById('resultContainer');
+        resultContainer.innerHTML = 'オプションの変更が適用されました';
+        resultContainer.style.color = 'green'; // 成功メッセージの色を緑に設定
+      }
+      
+      // モーダルを表示する関数
+      function showModal() {
+        document.getElementById("myModal").style.display = "block";
+      }
+      
+      // モーダルを非表示にする関数
+      function hideModal() {
+        document.getElementById("myModal").style.display = "none";
+      }
+    </script>
+  </div>
+</body>
 </html>

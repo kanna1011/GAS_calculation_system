@@ -1,5 +1,5 @@
 /**
- * Copyright 2023 Google LLC
+ * Copyright 2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,14 +72,14 @@ function appendFormData(adultCount, childCount, selectedOptions) {
     const currentLastRow = sheet.getLastRow();
     const nextRowNumber = currentLastRow - 1;
     const optionsString = selectedOptions.map(option => `${option.label}:${option.count}`).join(",");
-    const qrDocment = createDocumentWithQrCodeAndData(nextRowNumber, formattedDate);
+    const docment = createDocumentWithQrCodeAndData(nextRowNumber, formattedDate);
     sheet.getRange(currentLastRow+1, 1).setValue(nextRowNumber);
     sheet.getRange(currentLastRow+1, 2).setValue(adultCount);
     sheet.getRange(currentLastRow+1, 3).setValue(childCount);
     sheet.getRange(currentLastRow+1, 4).setValue(formattedDate);
     sheet.getRange(currentLastRow+1, 9).setValue(optionsString);
-    sheet.getRange(currentLastRow+1, 16).setValue(qrDocment);
-    return qrDocment;
+    sheet.getRange(currentLastRow+1, 16).setValue(docment);
+    return docment;
 }
 /**
  * オプションの変更
@@ -90,11 +90,11 @@ function editOptions(id, selectedOptions) {
   const optionsString = selectedOptions.map(option => `${option.label}:${option.count}`).join(",");
   const entryTime = new Date(sheet.getRange(rowIndex, 4).getValue());
   const formattedDate = Utilities.formatDate(entryTime, 'JST', 'yyyy/MM/dd HH:mm:ss');
-  const qrDocment = createDocumentWithQrCodeAndData(id, formattedDate);
+  const docment = createDocumentWithQrCodeAndData(id, formattedDate);
 
   sheet.getRange(rowIndex, 9).setValue(optionsString);
-  sheet.getRange(rowIndex, 16).setValue(qrDocment);
-  return qrDocment;
+  sheet.getRange(rowIndex, 16).setValue(docment);
+  return docment;
 }
 /**
  * 設定した割引内容をシートに入力
@@ -165,7 +165,6 @@ function calculateSettlement(id, discount = null, target = null) {
     if (diff > maxTime) {
         diff = maxTime;
     }
-    // 計算用初期値
     let totalPrice = 0;
     let adultPrice = 0;
     let childPrice = 0;
@@ -175,13 +174,13 @@ function calculateSettlement(id, discount = null, target = null) {
     let discountAdultPrice = 0;
     let discountChildPrice = 0;
     let discountTotalPrice = 0;
-    // 差分確認
     if (diff <= minTime) {
         diff = minTime;
         adultTotalPrice = adultCount * minPrice;
         childTotalPrice = childCount * (minPrice / 2);
         totalPrice = adultTotalPrice + childTotalPrice;
-    } else {
+    }
+    else {
         let minutesDiff = diff - minTime;
         minutesDiff = Math.ceil(minutesDiff / billingInterval);
         diff = minTime + (minutesDiff * billingInterval);
@@ -199,30 +198,16 @@ function calculateSettlement(id, discount = null, target = null) {
         }
         totalPrice = adultTotalPrice + childTotalPrice;
     }
-    // オプション処理
     if (options) {
       optionsTotal = calculateOptionsTotal(settingsSheet, options);
       totalPrice = totalPrice + optionsTotal;
     }
-    // 割引処理
     if (discount == null) {
         const discountValue = findRowByDiscountValue(settingsSheet, getDiscount);
         discount = discountValue;
         target = getDiscountTarget;
     }
     if (discount != null) {
-      if (diff <= ( discount * billingInterval)) {
-        if (target == '大人のみ適用') {
-          discountAdultPrice = adultTotalPrice;
-        } else if (target == '子供のみ適用') {
-          discountChildPrice = childTotalPrice;
-        } else {
-          discountAdultPrice = adultTotalPrice;
-          discountChildPrice = childTotalPrice;
-        }
-        discountTotalPrice = discountAdultPrice + discountChildPrice;
-        totalPrice = totalPrice - discountTotalPrice;
-      } else {
         if (target == '大人のみ適用') {
           discountAdultPrice = (adultCount * adultPricePerMinute) * discount;
         } else if (target == '子供のみ適用') {
@@ -232,13 +217,8 @@ function calculateSettlement(id, discount = null, target = null) {
           discountChildPrice = (childCount * childPricePerMinute) * discount;
         }
         discountTotalPrice = discountAdultPrice + discountChildPrice;
-        if (totalPrice < discountTotalPrice) {
-          discountTotalPrice = totalPrice;
-        }
         totalPrice = totalPrice - discountTotalPrice;
-      }
     }
-    // シート反映
     taxTotalPrice = Math.round(totalPrice * (1 + tax));
     sheet.getRange(rowIndex, 6).setValue(diff);
     sheet.getRange(rowIndex, 7).setValue(adultTotalPrice);
@@ -307,7 +287,7 @@ function createDocumentWithCalcData(id) {
     var totalPriceText = body.appendParagraph("合計料金　　　　　　: " + formattedTotalPrice + "円");
     var totalPriceTaxText = body.appendParagraph("税込料金　　　　　　: " + formattedTotalPriceTax + "円");
     // テキストサイズ設定
-    const textFontSize = 27;
+    const textFontSize = 24;
     enterLabelText.editAsText().setFontSize(textFontSize);
     enterText.editAsText().setFontSize(textFontSize);
     exitLabelText.editAsText().setFontSize(textFontSize);
@@ -406,15 +386,16 @@ function convertStringToArray(str) {
     return str.split(',').map(item => item.trim());
 }
 /**
- * QRコードのドキュメントを作成
+ * ドキュメントを作成
  */
 function createDocumentWithQrCodeAndData(nextRowNumber, formattedDate) {
-    const doc = DocumentApp.create('QR Code for ' + nextRowNumber);
+    const doc = DocumentApp.create('Document ' + nextRowNumber);
     const body = doc.getBody();
-    const qrBlob = generateQrCode(nextRowNumber.toString());
-    body.appendImage(qrBlob).setHeight(600).setWidth(600);
+    var id = body.appendParagraph(String(nextRowNumber));
     var paragraph = body.appendParagraph("入室時間: " + formattedDate);
+    id.setAlignment(DocumentApp.HorizontalAlignment.CENTER); // 中央揃え
     paragraph.setAlignment(DocumentApp.HorizontalAlignment.CENTER); // 中央揃え
+    id.editAsText().setFontSize(70);
     paragraph.editAsText().setFontSize(30);
 
     // ファイルの共有設定
@@ -424,15 +405,6 @@ function createDocumentWithQrCodeAndData(nextRowNumber, formattedDate) {
     return doc.getUrl();
 }
 
-
-/**
- * QRコードを作成
- */
-function generateQrCode(data) {
-    const url = "https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=" + data;
-    const response = UrlFetchApp.fetch(url);
-    return response.getBlob();
-}
 /**
  * Webアプリケーション初期画面設定
  */
@@ -489,36 +461,5 @@ function getLastRowOfColumn(sheet, column) {
     }
   }
   return 0; // もし全てのセルが空なら0を返します
-}
-/**
- * データベースシートにデータを移行
- */
-function moveDataToDatabase() {
-  var sourceSpreadsheet = SpreadsheetApp.getActiveSpreadsheet(); // 現在のスプレッドシート
-  var sourceSheet = sourceSpreadsheet.getSheetByName('入力シート'); // データが含まれているシート
-  var lastRow = sourceSheet.getLastRow(); // 最後の行番号を取得
-
-  // データの範囲を取得
-  var range = sourceSheet.getRange(3, 2, lastRow - 2, 14);
-  var data = range.getValues(); // データを2次元配列として取得
-
-  // データベーススプレッドシートを開く（ファイルIDを指定）
-  var databaseSpreadsheet = SpreadsheetApp.openById('1d0kqlTtM0pnKwzIyld4OiVdkfNYVEGwmRmBuNXNhI1w');
-  var databaseSheet = databaseSpreadsheet.getSheetByName('データベース'); // データベースシートを指定
-
-  // 5列目にデータが入っているかチェック
-  for (var i = 0; i < data.length; i++) {
-    if (data[i][3] === '') {
-      throw new Error("清算が完了していないデータが存在します（番号: " + (i + 1) + "）");
-    }
-  }
-
-  // データを新しいスプレッドシートに書き込む
-  var nextEmptyRow = databaseSheet.getLastRow() + 1; // データベースシートの次の空の行を取得
-  databaseSheet.getRange(nextEmptyRow, 1, data.length, data[0].length).setValues(data);
-
-  // 元のスプレッドシートのデータをクリアする（必要に応じて）
-  var clearRange = sourceSheet.getRange(3, 1, lastRow - 1, 17);
-  clearRange.clear();
 }
 console.log(hello());
